@@ -157,4 +157,7 @@ For this, I connected to the 4g of my phone and I used the following command to 
 ```bash
 dig AXFR <domaine> @<public ip of domain> #command generating a DNS Zone transfer
 ```
+### Troubleshooting
 
+/var/log/st2/st2api.log : STACKSTORM API logs
+/var/osssec/logs/ossec.log : WAZUH logs
