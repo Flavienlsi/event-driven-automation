@@ -52,17 +52,18 @@ Or by filtering directly in the stackstorm rule with a criteria.
 For the rule rule-jiraTask-createFile-orquestaWorkflow.yaml I used a criteria to filter the alerts.  
 For the rules rule-edl-external.yaml and rule-edl-internal.yaml I used the wazuh instance to filter the alerts.  
 There is three differents rules configured :
- - /stackstorm/rule-jiraTask-createFile-orquestaWorkflow.yaml will trigger the orquesta workflow that we will see in the Stackstorm workflow section.
- - /stackstorm/rule-edl-external.yaml  will trigger the gitlab action and update the file for external IPs in a gitlab repo.
- - /stackstorm/rule-edl-internal.yaml  will trigger the gitlab action and update the file for internal IPs in a gitlab repo.
+ - [rule-jiraTask-createFile-orquestaWorkflow.yaml](stackstorm/wazuh/rules/rule-jiraTask-createFile-orquestaWorkflow.yaml) will trigger the orquesta workflow that we will see in the Stackstorm workflow section.
+ - [rule-edl-external](stackstorm/wazuh/rules/rule-edl-external.yaml)  will trigger the gitlab action and update the file for external IPs in a gitlab repo.
+ - [rule-edl-internal](stackstorm/wazuh/rules/rule-edl-internal.yaml)  will trigger the gitlab action and update the file for internal IPs in a gitlab repo.
 
 ### Stackstorm action
 
 I created a python script based action in the GitLab pack that update a file in a GitLab repository. 
 This could be used to update an External Dynamic List to block IPs in a Palo Alto firewall for example.  
-Script is located in the stackstorm/gitlab/actions/modif_file.py file from this repository.  
-The metadata file for this script is located in the stackstorm/gitlab/actions/modif_file.yaml file. 
-It is used te collect the variables needed for the script to run.
+You can find the script here [modif_file.py](stackstorm/gitlab/actions/modif_file.py).  
+You can find the metadata file here [modif_file.yaml](stackstorm/gitlab/actions/modif_file.yaml). 
+It is used to collect the variables needed for the script to run.
+
 Since this is not hardcoded, we can specify the value of the vars in the rule file. 
 
 ### Stackstorm workflow
@@ -78,9 +79,9 @@ flowchart LR
     D -->|When create_issue succeed| F(Assign Issue)
     E -->|When create_file succeed| G(Write into file)
 ```
-The metadata file is used to set the vars with their value and the orquesta script is used to run the actions.
-The metadata file is located in the [metadata-workflow.yaml](stackstorm/wazuh/actions/metadata-workflow.yaml) of this repository.
-The orquesta script is located in the stackstorm/wazuh/actions/workflows/workflow-orchestra.yaml of this repository.
+The metadata file is used to set the vars with their value and the orquesta script is used to run the actions.  
+Find the metadata workflow here [metadata-workflow.yaml](stackstorm/wazuh/actions/metadata-workflow.yaml)  
+Find the orquesta script here [workflow-orchestra.yaml](stackstorm/wazuh/actions/workflows/workflow-orchestra.yaml)
 
 ### Integration config in wazuh on the production environment
  
