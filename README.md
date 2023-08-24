@@ -25,17 +25,17 @@ graph LR
 
 ### Push sensor / Stackstorm integration in wazuh
 
-When wazuh receive an alert from the learning-2023-02, it will run a python script. 
-This script is triggered by a bash script that is declared in the /etc/ossec/etc/ossec.conf file. 
-The python and bash files are located in the /var/ossec/integrations folder.
-The python script will send a POST request to the stackstorm API, with the alert information.
-On the stackstorm server, the POST request will be received by the webhook sensor, which will trigger the workflow.
-The webhook sensor is configured so that it will trigger the rule only if the url targeted is /wazuh.
+When wazuh receive an alert from the learning-2023-02, it will run a python script.  
+This script is triggered by a bash script that is declared in the /etc/ossec/etc/ossec.conf file.  
+The python and bash files are located in the /var/ossec/integrations folder.  
+The python script will send a POST request to the stackstorm API, with the alert information.  
+On the stackstorm server, the POST request will be received by the webhook sensor, which will trigger the workflow.  
+The webhook sensor is configured so that it will trigger the rule only if the url targeted is /wazuh.  
 
 ### Stackstorm wazuh pack
 
-I created a wazuh pack in stackstorm, which contains the webhook sensor and the workflow.
-The pack is located in the /opt/stackstorm/packs/wazuh folder.
+I created a wazuh pack in stackstorm, which contains the webhook sensor and the workflow.  
+The pack is located in the /opt/stackstorm/packs/wazuh folder.  
 Here you can see the arborecence of the pack:
 
 ![img_tree.png](img_tree.png)
@@ -76,10 +76,10 @@ flowchart LR
 ```
 
 ### Integration config in wazuh on the production environment
-
-We will use the CDB lists already configured.
-First list is the list of the internal networks. It is located in the /var/ossec/lists/ess-client-nets file. We will filter source ip that are in this list.
-Second list is the list of the external networks. It is located in the /var/ossec/lists/gpn-client-nets file. We will filter source ip that are not in this list.
+ 
+We will use the CDB lists already configured.  
+First list is the list of the internal networks. It is located in the /var/ossec/lists/ess-client-nets file. We will filter source ip that are in this list.  
+Second list is the list of the external networks. It is located in the /var/ossec/lists/gpn-client-nets file. We will filter source ip that are not in this list.  
 And we are going to specify this list in the ruleset of ossec.conf file.
 
 ```xml
@@ -131,10 +131,10 @@ Update the ossec.conf file with your integration config :
           <alert_format>json</alert_format>
         </integration>
 ```
-You need to specify your personnal **API KEY**. 
+You need to specify your personnal **API KEY**.   
 In the intergation folder, we need to put the name of the script without the extension. Here it is custom-stackstorm-rule.
 
-We are filtering alerts if the group is named internal or external. Those groups are explained before.
+We are filtering alerts if the group is named internal or external. Those groups are explained before.  
 After adding the custom integration script (python script) in the /var/ossec/integrations folder, we need to execute those commands :
 ```bash
 chmod 750 custom-stackstorm-rule
@@ -149,15 +149,15 @@ systemctl restart wazuh-manager
 
 ### Testing the workflow by creating an alert
 
-To test the workflow, we need to create an alert in wazuh.
-Since we are filtering concerning DNS Transfer zone, we will create an alert for this.
-To do so, we need to be in an other network than the one of the wazuh server.
-For this, I connected to the 4g of my phone and I used the following command to create an alert :
+To test the workflow, we need to create an alert in wazuh.  
+Since we are filtering concerning DNS Transfer zone, we will create an alert for this.  
+To do so, we need to be in an other network than the one of the wazuh server.  
+For this, I connected to the 4g of my phone and I used the following command to create an alert : 
 
 ```bash
 dig AXFR <domaine> @<public ip of domain> #command generating a DNS Zone transfer
 ```
 ### Troubleshooting
 
-/var/log/st2/st2api.log : STACKSTORM API logs
+/var/log/st2/st2api.log : STACKSTORM API logs  
 /var/osssec/logs/ossec.log : WAZUH logs
