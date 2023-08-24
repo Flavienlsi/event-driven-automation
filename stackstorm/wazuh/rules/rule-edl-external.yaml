@@ -1,0 +1,16 @@
+---
+    name: "rule-edl-external"
+    pack: "wazuh"
+    description: "Listen for wazuh alert, and update gitlab file"
+    enabled: true
+
+    trigger:
+        type: "core.st2.webhook"
+        parameters:
+            url: "wazuh"
+    action:
+        ref: "gitlab.modif_file"
+        parameters:
+            file_path: "external.txt"
+            repository_id: "9579"
+            private_token: "sUtz5yWjQGjRbpuYgaTN"

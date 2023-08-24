@@ -1,0 +1,54 @@
+version: 1.0
+description: A basic sequential workflow.
+
+input:
+  - timestamp
+  - description
+  - agent_name
+  - agent_ip
+  - full_log
+tasks:
+  setup_task:
+    # Run tasks simutanously
+    next:
+      - do:
+          - create_issue
+          - create_file
+  create_issue:
+    action: jira.create_issue
+    input:
+      summary: <% ctx().description %>
+      type: "Task"
+      description: <% ctx().full_log %>
+      project: "TEST"
+    next:
+      - when: <% succeeded() %>
+        publish: task=<% result().result.key %>
+        do: assign_issue
+  assign_issue:
+    action: jira.assign_issue
+    input:
+      assignee: "flavienluisetti"
+      issue: <% ctx().task %>
+    next:
+      - when: <% succeeded() %>
+        publish: task_assigned=<% result() %>
+  create_file:
+    action: linux.file_touch
+    input:
+      file: /tmp/alert_<% ctx().timestamp %>
+      hosts: stackstorm-lab.cslab.esss.lu.se
+    next:
+      - when: <% succeeded() %>
+        publish: file_info=<% result() %>
+        do: write_to_file
+  write_to_file:
+    action: core.remote
+    input:
+      cmd: echo "<% ctx().full_log %>" > /tmp/alert_<% ctx().timestamp %>
+      hosts: stackstorm-lab.cslab.esss.lu.se
+    next:
+      - when: <% succeeded() %>
+        publish: write_file=<% result() %>
+output:
+  - result: <% ctx().task %>

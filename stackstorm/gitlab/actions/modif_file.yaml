@@ -1,0 +1,33 @@
+---
+name: modif_file
+description: "Modfif file from repo gitlab"
+
+runner_type: python-script
+entry_point: modif_file.py
+enabled: true
+parameters:
+  srcip:
+    required: true
+    type: string
+    default: "{{ trigger.body.srcip }}"
+  gitlab_url:
+    required: true
+    type: string
+    default: "https://gitlab.esss.lu.se"
+  branch_name:
+    required: true
+    type: string
+    default: "main"
+  commit_message:
+    required: true
+    type: string
+    default: "IP address added"
+  private_token:
+    required: true
+    type: string
+  repository_id:
+    required: true
+    type: string
+  file_path:
+    required: true
+    type: string

@@ -1,0 +1,28 @@
+---
+name: workflow_wazuh_jira_orquestra
+pack: wazuh
+description: The metadata file for orchestra workflow
+runner_type: orquesta
+entry_point: workflows/workflow_wazuh_jira_orquestra.yaml
+enabled: true
+parameters:
+  timestamp:
+    required: true
+    type: string
+    default: "{{ trigger.body.timestamp }}"
+  description:
+    required: true
+    type: string
+    default: "{{ trigger.body.description }}"
+  agent_name:
+    required: true
+    type: string
+    default: "{{ trigger.body.agent_name }}"
+  agent_ip:
+    required: true
+    type: string
+    default: "{{ trigger.body.agent_ip }}"
+  full_log:
+    required: true
+    type: string
+    default: "{{ trigger.body.full_log }}"
