@@ -58,11 +58,12 @@ There is three differents rules configured :
 
 ### Stackstorm action
 
-I created a python script based action in the GitLab pack that update a file in a GitLab repository. For testing, right now the file that is being modified is EDL.txt in this repository.
-This could be used to update an External Dynamic List to block IPs in a Palo Alto firewall for example.
-Script is located in the /stackstorm/modify_file.py file.
-The metadata file for this script is located in the /stackstorm/modify_file.yaml file. It is used te collect the variables needed for the script to run : Here, I collect the srcip from the alert that is going to be added to EDL.txt file.
-
+I created a python script based action in the GitLab pack that update a file in a GitLab repository. 
+This could be used to update an External Dynamic List to block IPs in a Palo Alto firewall for example.  
+Script is located in the stackstorm/gitlab/actions/modif_file.py file from this repository.  
+The metadata file for this script is located in the stackstorm/gitlab/actions/modif_file.yaml file. 
+It is used te collect the variables needed for the script to run.
+Since this is not hardcoded, we can specify the value of the vars in the rule file. 
 
 ### Stackstorm workflow
 
@@ -77,6 +78,9 @@ flowchart LR
     D -->|When create_issue succeed| F(Assign Issue)
     E -->|When create_file succeed| G(Write into file)
 ```
+The metadata file is used to set the vars with their value and the orquesta script is used to run the actions.
+The metadata file is located in the stackstorm/wazuh/actions/metadata-workflow.yaml of this repository.
+The orquesta script is located in the stackstorm/wazuh/actions/workflows/workflow-orchestra.yaml of this repository.
 
 ### Integration config in wazuh on the production environment
  
@@ -154,7 +158,7 @@ systemctl restart wazuh-manager
 
 To test the workflow, we need to create an alert in wazuh.  
 Since we are filtering concerning DNS Transfer zone, we will create an alert for this.  
-To do so, we need to be in an other network than the one of the wazuh server.  
+To do so, we need to be in another network than the one of the wazuh server.  
 For this, I connected to the 4g of my phone and I used the following command to create an alert : 
 
 ```bash
