@@ -79,7 +79,7 @@ flowchart LR
     E -->|When create_file succeed| G(Write into file)
 ```
 The metadata file is used to set the vars with their value and the orquesta script is used to run the actions.
-The metadata file is located in the [metadata-workflow.yaml](https://raw.githubusercontent.com/Flavienlsi/event-driven-automation/main/stackstorm/wazuh/actions/metadata-workflow.yaml) of this repository.
+The metadata file is located in the [metadata-workflow.yaml](stackstorm/wazuh/actions/metadata-workflow.yaml) of this repository.
 The orquesta script is located in the stackstorm/wazuh/actions/workflows/workflow-orchestra.yaml of this repository.
 
 ### Integration config in wazuh on the production environment
