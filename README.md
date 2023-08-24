@@ -28,11 +28,10 @@ graph LR
 ### Push sensor / Stackstorm integration in wazuh
 
 When wazuh receive an alert from the learning-2023-02, it will run a python script.  
-This script is triggered by a bash script that is declared in the /etc/ossec/etc/ossec.conf file.  
-The python and bash files are located in the /var/ossec/integrations folder.  
+This script is declared in the /etc/ossec/etc/ossec.conf file.  
+The python file is located in the /var/ossec/integrations folder.  
 The python script will send a POST request to the stackstorm API, with the alert information.  
-On the stackstorm server, the POST request will be received by the webhook sensor, which will trigger the workflow.  
-The webhook sensor is configured so that it will trigger the rule only if the url targeted is /wazuh.  
+On the stackstorm server, the POST request will be received by the webhook sensor (named core.st2.webhook), which will trigger the workflow.  
 
 ### Stackstorm wazuh pack
 
@@ -47,9 +46,11 @@ Here you can see the arborecence of the pack:
 In the wazuh pack, there is a rule that will be triggered by the webhook sensor.
 The rule will run a workflow as we will see in the next section.
 This rule is located in the /opt/stackstorm/packs/wazuh/rules folder.
-It has a criteria that will be used to filter the alerts sent by the wazuh server.
-Right now, the criteria is set to only trigger the workflow when the description of the alert contains the word "sshd". So only for alerts related to ssh protocol.
-
+I used two differents ways to filter the alerts.  
+By filtering directly on the wazuh instance : explained in the following sections.  
+Or by filtering directly in the stackstorm rule with a criteria.
+For the rule rule-jiraTask-createFile-orquestaWorkflow.yaml I used a criteria to filter the alerts.
+For the rules rule-edl-external.yaml and rule-edl-internal.yaml I used the wazuh instance to filter the alerts.
 There is three differents rules configured :
  - /stackstorm/rule-jiraTask-createFile-orquestaWorkflow.yaml will trigger the orquesta workflow that we will see in the Stackstorm workflow section.
  - /stackstorm/rule-edl-external.yaml  will trigger the gitlab action and update the file for external IPs in a gitlab repo.
