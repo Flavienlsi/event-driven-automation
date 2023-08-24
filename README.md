@@ -39,7 +39,7 @@ I created a wazuh pack in stackstorm, which contains the webhook sensor and the 
 The pack is located in the /opt/stackstorm/packs/wazuh folder.
 Here you can see the arborecence of the pack:
 
-![img_1.png](img_1.png)
+![img_tree.png](img_tree.png)
 
 ### Stackstorm rule
 
