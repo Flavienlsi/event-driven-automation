@@ -5,8 +5,10 @@ For this use case we will use the following tools:
    - Python
    - Jira
 
-This is an introduction to the event-driven automation project. The goal is to see how to use stackstorm in order to automate a workflow. In this case we will use a Wazuh alert to create a Jira issue.
-For testing the workflow automation, I used the wazuh-test instance. And I integrated the server "learning-2023-02.cslab.esss.lu.se", so I can receive alerts from the learning-2023-02 in wazuh and not use sample data.
+This is an introduction to the event-driven automation project.  
+The goal is to see how to use stackstorm in order to automate a workflow. 
+In this case we will use a Wazuh alert to create a Jira issue.  
+For testing the workflow automation, I used the wazuh-test instance. And I integrated the server "learning-2023-02", so I can receive alerts from the learning-2023-02 in wazuh and instead of using sample data.
 
 
 ## Use case description
