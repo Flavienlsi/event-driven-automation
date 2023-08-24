@@ -48,9 +48,9 @@ The rule will run a workflow as we will see in the next section.
 This rule is located in the /opt/stackstorm/packs/wazuh/rules folder.
 I used two differents ways to filter the alerts.  
 By filtering directly on the wazuh instance : explained in the following sections.  
-Or by filtering directly in the stackstorm rule with a criteria.
-For the rule rule-jiraTask-createFile-orquestaWorkflow.yaml I used a criteria to filter the alerts.
-For the rules rule-edl-external.yaml and rule-edl-internal.yaml I used the wazuh instance to filter the alerts.
+Or by filtering directly in the stackstorm rule with a criteria.  
+For the rule rule-jiraTask-createFile-orquestaWorkflow.yaml I used a criteria to filter the alerts.  
+For the rules rule-edl-external.yaml and rule-edl-internal.yaml I used the wazuh instance to filter the alerts.  
 There is three differents rules configured :
  - /stackstorm/rule-jiraTask-createFile-orquestaWorkflow.yaml will trigger the orquesta workflow that we will see in the Stackstorm workflow section.
  - /stackstorm/rule-edl-external.yaml  will trigger the gitlab action and update the file for external IPs in a gitlab repo.
