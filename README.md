@@ -1,4 +1,3 @@
-
 # Event-driven automation project
 For this use case we will use the following tools:
    - Stackstom
@@ -49,9 +48,10 @@ This rule is located in the /opt/stackstorm/packs/wazuh/rules folder.
 It has a criteria that will be used to filter the alerts sent by the wazuh server.
 Right now, the criteria is set to only trigger the workflow when the description of the alert contains the word "sshd". So only for alerts related to ssh protocol.
 
-There is two differents rules configured :
+There is three differents rules configured :
  - /stackstorm/rule-jiraTask-createFile-orquestaWorkflow.yaml will trigger the orquesta workflow that we will see in the Stackstorm workflow section.
- - /stackstorm/rule-modif-file-action.yaml  will trigger the gitlab action that we will see in the Stackstorm action section.
+ - /stackstorm/rule-edl-external.yaml  will trigger the gitlab action and update the file for external IPs in a gitlab repo.
+ - /stackstorm/rule-edl-internal.yaml  will trigger the gitlab action and update the file for internal IPs in a gitlab repo.
 
 ### Stackstorm action
 
@@ -77,7 +77,9 @@ flowchart LR
 
 ### Integration config in wazuh on the production environment
 
-First we will create a CDB list in /var/ossec/etc/lists/internal. This list will contain the subnetworks that we want to consider as internal.
+We will use the CDB lists already configured.
+First list is the list of the internal networks. It is located in the /var/ossec/lists/ess-client-nets file. We will filter source ip that are in this list.
+Second list is the list of the external networks. It is located in the /var/ossec/lists/gpn-client-nets file. We will filter source ip that are not in this list.
 And we are going to specify this list in the ruleset of ossec.conf file.
 
 ```xml
@@ -90,9 +92,9 @@ And we are going to specify this list in the ruleset of ossec.conf file.
 ```xml
 <rule id="66034" level="10">
     <if_sid>66020</if_sid>
-    <match>SSH::Password_Guessing|SNIFFPASS::HTTP_POST_Password_Seen</match>
+    <match>SSH::Password_Guessing|SNIFFPASS::HTTP_POST_Password_Seen</match> <!-- Match for the alerts concerning Password_Guessing or HTTP_POST_Password_Seen -->
     <description>Zeek: Alert Notice details ssh password guessing detected.</description>
-    <group>internal,</group>
+    <group>internal,</group> <!-- Ties a internal group to the rule triggered so that we can filter in the integration (see next section) -->
     <list field="srcip" lookup="address_match_key">etc/lists/gpn-client-nets</list>
   </rule>
 ```
@@ -100,48 +102,46 @@ And we are going to specify this list in the ruleset of ossec.conf file.
 ```xml
 <rule id="66045" level="7">
     <if_sid>66020</if_sid>
-    <match>DNS_AXFR|DnsTunnelsAttack:DNS::External_Name</match>
+    <match>DNS_AXFR|DnsTunnelsAttack:DNS::External_Name</match> <!-- Match for the alerts concerning DNS_AXFR or DnsTunnelsAttack -->
     <description>Zeek: Alert Notice for DNS zone transfer or DNS tunnel attempt/attack detected.</description>
     <list field="srcip" lookup="not_address_match_key">etc/lists/ess-client-nets</list>
-     <group>external,</group>
+    <group>external,</group> <!-- Ties a external group to the rule triggered so that we can filter in the integration (see next section) -->
   </rule>
 ```
-
-Then we need to create a rule that will run the python script when the rule is triggered.
 
 Update the ossec.conf file with your integration config : 
 
 ```xml
-<!-- First integration sending data to first stackstorm rule-modif-file -->
+<!-- First integration sending data to first stackstorm rule-edl-external -->
     <integration>
-          <name>custom-stackstorm-rule</name>
-          <hook_url>https://stackstorm-lab.cslab.esss.lu.se/api/v1/webhooks/wazuh</hook_url>
+          <name>custom-stackstorm-rule</name> <!-- Name of the python script we are sending the data (hook_url, api_key) into -->
+          <hook_url>https://#stackstorm server hostname#/api/v1/webhooks/wazuh</hook_url> <!-- URL finishing by "wazuh" because the stackstorm rule for external action is listening to this specific URL -->
           <api_key>**API KEY**</api_key>
-          <group>external</group>
+          <group>external</group> <!-- Filter alerts with external group created before in the rule -->
           <alert_format>json</alert_format>
         </integration>
 ```
 ```xml
-<!-- Second integration sending data to second stackstorm rule-modif-file -->
+<!-- Second integration sending data to second stackstorm rule-edl-internal -->
     <integration>
-          <name>custom-stackstorm-rule</name>
-          <hook_url>https://stackstorm-lab.cslab.esss.lu.se/api/v1/webhooks/wazuh2</hook_url>
+          <name>custom-stackstorm-rule</name> <!-- Name of the python script we are sending the data (hook_url, api_key) into -->
+          <hook_url>https://#stackstorm server hostname#/api/v1/webhooks/wazuh2</hook_url> <!-- URL finishing by "wazuh2" because the stackstorm rule for internal action is listening to this specific URL -->
           <api_key>**API KEY**</api_key>
-          <group>internal</group>
+          <group>internal</group> <!-- Filter alerts with internal group created before in the rule -->
           <alert_format>json</alert_format>
         </integration>
 ```
 You need to specify your personnal **API KEY**. 
-In the intergation folder, we need to put the name of the script without the extension. Here it is custom-stackstorm-rule
+In the intergation folder, we need to put the name of the script without the extension. Here it is custom-stackstorm-rule.
 
 We are filtering alerts if the group is named internal or external. Those groups are explained before.
-After adding the customs integration scripts in the /var/ossec/integrations folder, we need to execute those commands :
+After adding the custom integration script (python script) in the /var/ossec/integrations folder, we need to execute those commands :
 ```bash
 chmod 750 custom-stackstorm-rule
 chown root:ossec custom-stackstorm-rule
 ```
 
-Once it is done, to apply the changes, we need to restart the wazuh service (only the update of ossec.conf file involve restart of wazuh service) :
+Once it is done, to apply the changes, we need to restart the wazuh service (only the update of ossec.conf file involve restart of wazuh-manager service) :
 
 ```bash
 systemctl restart wazuh-manager
@@ -155,6 +155,6 @@ To do so, we need to be in an other network than the one of the wazuh server.
 For this, I connected to the 4g of my phone and I used the following command to create an alert :
 
 ```bash
-dig AXFR esss.lu.se @194.47.240.197
+dig AXFR <domaine> @<public ip of domain> #command generating a DNS Zone transfer
 ```
 
