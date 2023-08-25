@@ -37,7 +37,7 @@ On the stackstorm server, the POST request will be received by the webhook senso
 
 I created a wazuh pack in stackstorm, which contains the webhook sensor and the workflow.  
 The pack is located in the /opt/stackstorm/packs/wazuh folder.  
-Here you can see the arborecence of the pack:
+Here you can see the tree structure of the pack:
 
 ![img_tree.png](img_tree.png)
 
@@ -140,7 +140,8 @@ Update the ossec.conf file with your integration config :
         </integration>
 ```
 You need to specify your personnal **API KEY**.   
-In the intergation folder, we need to put the name of the script without the extension. Here it is custom-stackstorm-rule.
+In the intergation folder, we need to put the name of the script without the extension.  
+Find here the python script [custom-stackstorm-rule.py](Wazuh_config/custom-stackstorm-rule.py)
 
 We are filtering alerts if the group is named internal or external. Those groups are explained before.  
 After adding the custom integration script (python script) in the /var/ossec/integrations folder, we need to execute those commands :
